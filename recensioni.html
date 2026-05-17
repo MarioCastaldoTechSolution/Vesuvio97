@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recensioni | Vesuvio 97</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #050505;
+      --bg-soft: rgba(16, 16, 16, 0.76);
+      --card: rgba(255, 255, 255, 0.055);
+      --gold: #d6a84f;
+      --green: #34e0a1;
+      --text: #f5f1e8;
+      --muted: #a9a39a;
+      --border: rgba(255, 255, 255, 0.08);
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: 'Inter', sans-serif;
+      background:
+        linear-gradient(90deg, rgba(5,5,5,0.96) 0%, rgba(5,5,5,0.78) 48%, rgba(5,5,5,0.42) 100%),
+        url('https://images.unsplash.com/photo-1579751626657-72bc17010498?auto=format&fit=crop&w=1800&q=80') center/cover no-repeat fixed;
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 76% 46%, rgba(214,168,79,0.2), transparent 30%);
+      pointer-events: none;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      padding: 28px 7vw;
+      display: flex;
+      flex-direction: column;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: 'Cinzel', serif;
+      letter-spacing: 3px;
+      font-size: 18px;
+    }
+
+    .logo-mark {
+      width: 34px;
+      height: 34px;
+      border: 1px solid var(--gold);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: var(--gold);
+      font-size: 16px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+      color: var(--muted);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    .nav-links a:hover,
+    .nav-links .active {
+      color: var(--gold);
+    }
+
+    main {
+      flex: 1;
+      width: 100%;
+      padding: 10vh 0 8vh;
+      animation: fadeUp 1s ease forwards;
+    }
+
+    .reviews-hero {
+      display: grid;
+      grid-template-columns: minmax(0, 0.95fr) minmax(280px, 0.55fr);
+      gap: 44px;
+      align-items: end;
+      margin-bottom: 46px;
+    }
+
+    .intro {
+      max-width: 760px;
+    }
+
+    .eyebrow {
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      font-size: 12px;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(34px, 8vw, 96px);
+      line-height: 1.02;
+      margin-bottom: 24px;
+      overflow-wrap: break-word;
+    }
+
+    p {
+      max-width: 560px;
+      color: var(--muted);
+      line-height: 1.8;
+      font-size: 17px;
+    }
+
+    .rating-panel {
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 28px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+      backdrop-filter: blur(16px);
+    }
+
+    .rating-value {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .rating-value strong {
+      color: var(--gold);
+      font-family: 'Cinzel', serif;
+      font-size: 54px;
+      line-height: 1;
+    }
+
+    .rating-value span {
+      color: var(--muted);
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    .stars {
+      color: var(--gold);
+      letter-spacing: 3px;
+      font-size: 19px;
+      margin-bottom: 14px;
+      white-space: nowrap;
+    }
+
+    .rating-panel p {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .reviews-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .review-card {
+      min-height: 260px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 24px;
+      background: var(--card);
+      backdrop-filter: blur(14px);
+      transition: 0.35s ease;
+    }
+
+    .review-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(214,168,79,0.45);
+      background: rgba(255, 255, 255, 0.075);
+    }
+
+    .review-card p {
+      margin: 18px 0 26px;
+      font-size: 15px;
+      line-height: 1.75;
+    }
+
+    .review-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .review-score {
+      color: var(--green);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      white-space: nowrap;
+    }
+
+    .review-author strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 15px;
+    }
+
+    .review-author span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .tripadvisor-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      margin-top: 34px;
+      padding: 24px 28px;
+      border: 1px solid rgba(52,224,161,0.2);
+      border-radius: 24px;
+      background: linear-gradient(90deg, rgba(52,224,161,0.12), rgba(255,255,255,0.035));
+      backdrop-filter: blur(16px);
+    }
+
+    .tripadvisor-strip span {
+      color: var(--muted);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1.4px;
+    }
+
+    .tripadvisor-strip img {
+      width: min(260px, 56vw);
+      height: auto;
+      display: block;
+    }
+
+    .tripadvisor-logo {
+      display: inline-flex;
+      align-items: center;
+      padding: 14px 18px;
+      border-radius: 16px;
+      background: #fff;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.2);
+    }
+
+    footer {
+      padding: 28px 0;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 900px) {
+      .nav-links {
+        display: none;
+      }
+
+      .page {
+        padding: 24px 6vw;
+      }
+
+      main {
+        padding: 12vh 0 8vh;
+      }
+
+      .reviews-hero,
+      .reviews-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .tripadvisor-strip {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <nav>
+      <a href="index.html" class="logo">
+        <span class="logo-mark">V</span>
+        <span>Pizzeria Vesuvio 97</span>
+      </a>
+      <div class="nav-links">
+        <a href="le-nostre-pizze.html">Le nostre pizze</a>
+        <a href="ordina-ora.html">Ordina Ora</a>
+        <a href="prenota-un-tavolo.html">Prenota un tavolo</a>
+        <a href="recensioni.html" class="active">Recensioni</a>
+        <a href="chi-siamo.html">Chi siamo</a>
+      </div>
+    </nav>
+
+    <main>
+      <div class="reviews-hero">
+        <div class="intro">
+          <div class="eyebrow">Le voci dei nostri clienti</div>
+          <h1>Recensioni che profumano di Napoli.</h1>
+          <p>Ogni tavolo racconta una storia diversa: impasto leggero, servizio attento e pizze preparate con ingredienti scelti ogni giorno.</p>
+        </div>
+
+        <aside class="rating-panel" aria-label="Valutazione media">
+          <div class="rating-value">
+            <strong>4.8</strong>
+            <span>su 5</span>
+          </div>
+          <div class="stars" aria-label="5 stelle su 5">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p>Media delle recensioni dei clienti che hanno scelto Vesuvio 97 per una cena, una pausa veloce o una serata speciale.</p>
+        </aside>
+      </div>
+
+      <div class="reviews-grid">
+        <article class="review-card">
+          <div>
+            <div class="review-top">
+              <div class="stars" aria-label="5 stelle su 5">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+              <span class="review-score">5/5</span>
+            </div>
+            <p>"Pizza margherita perfetta: cornicione alto, profumo di basilico e pomodoro davvero saporito. Atmosfera elegante ma molto accogliente."</p>
+          </div>
+          <div class="review-author">
+            <strong>Giulia R.</strong>
+            <span>Cena in famiglia</span>
+          </div>
+        </article>
+
+        <article class="review-card">
+          <div>
+            <div class="review-top">
+              <div class="stars" aria-label="5 stelle su 5">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+              <span class="review-score">5/5</span>
+            </div>
+            <p>"Locale curato, personale gentile e tempi rapidi anche di sabato sera. La Pistacchiosa merita davvero l'assaggio."</p>
+          </div>
+          <div class="review-author">
+            <strong>Marco D.</strong>
+            <span>Serata tra amici</span>
+          </div>
+        </article>
+
+        <article class="review-card">
+          <div>
+            <div class="review-top">
+              <div class="stars" aria-label="5 stelle su 5">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+              <span class="review-score">5/5</span>
+            </div>
+            <p>"Ingredienti freschi e impasto leggerissimo. Si sente la cura in ogni dettaglio, dalla pizza al servizio al tavolo."</p>
+          </div>
+          <div class="review-author">
+            <strong>Antonio S.</strong>
+            <span>Pranzo veloce</span>
+          </div>
+        </article>
+
+        <article class="review-card">
+          <div>
+            <div class="review-top">
+              <div class="stars" aria-label="5 stelle su 5">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+              <span class="review-score">5/5</span>
+            </div>
+            <p>"Pizza buona e locale piacevole. Nel weekend c'&egrave; un po' di attesa, ma il personale &egrave; stato disponibile e cortese."</p>
+          </div>
+          <div class="review-author">
+            <strong>Elena M.</strong>
+            <span>Sabato sera</span>
+          </div>
+        </article>
+
+        <article class="review-card">
+          <div>
+            <div class="review-top">
+              <div class="stars" aria-label="4 stelle su 5">&#9733;&#9733;&#9733;&#9733;&#9734;</div>
+              <span class="review-score">4/5</span>
+            </div>
+            <p>"Ottimo equilibrio tra tradizione e stile moderno. Menu chiaro, pizze ricche e prezzo corretto per la qualit&agrave;."</p>
+          </div>
+          <div class="review-author">
+            <strong>Francesca L.</strong>
+            <span>Prima visita</span>
+          </div>
+        </article>
+
+        <article class="review-card">
+          <div>
+            <div class="review-top">
+              <div class="stars" aria-label="5 stelle su 5">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+              <span class="review-score">5/5</span>
+            </div>
+            <p>"Ordine da asporto arrivato puntuale, pizza ancora calda e packaging curato. Una soluzione comoda senza perdere il gusto della pizzeria."</p>
+          </div>
+          <div class="review-author">
+            <strong>Luca P.</strong>
+            <span>Ordine da asporto</span>
+          </div>
+        </article>
+      </div>
+
+      <div class="tripadvisor-strip">
+        <span>Recensioni disponibili anche su</span>
+        <a class="tripadvisor-logo" href="https://www.tripadvisor.it/" target="_blank" rel="noopener" aria-label="Vai a Tripadvisor">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/7/73/Tripadvisor_2025_Logo.svg" alt="Tripadvisor">
+        </a>
+      </div>
+    </main>
+
+    <footer>&copy; 2026 Vesuvio 97 - Pizzeria Napoletana</footer>
+  </div>
+</body>
+</html>

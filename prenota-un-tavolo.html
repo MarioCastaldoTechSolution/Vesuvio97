@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prenota un tavolo | Vesuvio 97</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #050505;
+      --card: rgba(255, 255, 255, 0.055);
+      --gold: #d6a84f;
+      --gold-soft: rgba(214, 168, 79, 0.16);
+      --red: #e14d4d;
+      --red-soft: rgba(225, 77, 77, 0.16);
+      --green: #34e0a1;
+      --text: #f5f1e8;
+      --muted: #a9a39a;
+      --border: rgba(255, 255, 255, 0.08);
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: 'Inter', sans-serif;
+      background:
+        linear-gradient(90deg, rgba(5,5,5,0.96) 0%, rgba(5,5,5,0.78) 48%, rgba(5,5,5,0.42) 100%),
+        url('https://images.unsplash.com/photo-1579751626657-72bc17010498?auto=format&fit=crop&w=1800&q=80') center/cover no-repeat fixed;
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 76% 46%, rgba(214,168,79,0.2), transparent 30%);
+      pointer-events: none;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      padding: 28px 7vw;
+      display: flex;
+      flex-direction: column;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: 'Cinzel', serif;
+      letter-spacing: 3px;
+      font-size: 18px;
+    }
+
+    .logo-mark {
+      width: 34px;
+      height: 34px;
+      border: 1px solid var(--gold);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: var(--gold);
+      font-size: 16px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+      color: var(--muted);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    .nav-links a:hover,
+    .nav-links .active {
+      color: var(--gold);
+    }
+
+    main {
+      flex: 1;
+      width: 100%;
+      padding: 9vh 0 8vh;
+      animation: fadeUp 1s ease forwards;
+    }
+
+    .booking-hero {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 32px;
+      margin-bottom: 42px;
+    }
+
+    .booking-intro {
+      max-width: 720px;
+    }
+
+    .eyebrow {
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      font-size: 12px;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(34px, 8vw, 96px);
+      line-height: 1.02;
+      margin-bottom: 24px;
+      overflow-wrap: break-word;
+    }
+
+    p {
+      max-width: 560px;
+      color: var(--muted);
+      line-height: 1.8;
+      font-size: 17px;
+    }
+
+    .booking-shell {
+      display: grid;
+      grid-template-columns: minmax(320px, 0.95fr) minmax(320px, 0.75fr);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .panel {
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.075), rgba(255,255,255,0.03));
+      backdrop-filter: blur(16px);
+      padding: 26px;
+    }
+
+    .panel-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .panel-title h2,
+    .form-title {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(25px, 3vw, 36px);
+      font-weight: 600;
+    }
+
+    .calendar-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .icon-btn,
+    .slot-btn,
+    .calendar-day,
+    .submit-btn {
+      border: 0;
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    .icon-btn {
+      width: 42px;
+      height: 42px;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      color: var(--text);
+      background: rgba(255,255,255,0.04);
+      font-size: 18px;
+      transition: 0.25s ease;
+    }
+
+    .icon-btn:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .weekdays,
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .weekdays {
+      margin-bottom: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      text-align: center;
+    }
+
+    .calendar-day {
+      aspect-ratio: 1;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.045);
+      color: var(--text);
+      font-size: 15px;
+      border: 1px solid transparent;
+      transition: 0.25s ease;
+      position: relative;
+    }
+
+    .calendar-day:hover:not(:disabled) {
+      border-color: var(--gold);
+      background: var(--gold-soft);
+      transform: translateY(-2px);
+    }
+
+    .calendar-day.is-empty {
+      visibility: hidden;
+    }
+
+    .calendar-day.is-past {
+      color: rgba(245,241,232,0.24);
+      cursor: not-allowed;
+    }
+
+    .calendar-day.is-sold-out {
+      background: var(--red-soft);
+      color: #ffb3b3;
+      border-color: rgba(225,77,77,0.45);
+      cursor: not-allowed;
+    }
+
+    .calendar-day.is-available::after,
+    .calendar-day.is-sold-out::after {
+      content: '';
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--gold);
+      position: absolute;
+      left: 50%;
+      bottom: 8px;
+      transform: translateX(-50%);
+    }
+
+    .calendar-day.is-sold-out::after {
+      background: var(--red);
+    }
+
+    .calendar-day.is-selected {
+      background: var(--gold);
+      color: #14100a;
+      border-color: var(--gold);
+      font-weight: 700;
+    }
+
+    .legend {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .legend i {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .legend .available {
+      background: var(--gold);
+    }
+
+    .legend .sold {
+      background: var(--red);
+    }
+
+    .slots {
+      margin-top: 26px;
+    }
+
+    .slots h3,
+    .field label {
+      color: var(--text);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1.4px;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .slot-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .slot-btn {
+      padding: 13px 10px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      color: var(--text);
+      transition: 0.25s ease;
+    }
+
+    .slot-btn:hover:not(:disabled) {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .slot-btn.is-selected {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: #14100a;
+      font-weight: 700;
+    }
+
+    .slot-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    .form-card {
+      display: grid;
+      gap: 20px;
+    }
+
+    .form-title {
+      margin-bottom: 4px;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      height: 52px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 0 16px;
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      font: inherit;
+      outline: none;
+      transition: 0.25s ease;
+    }
+
+    .field select option {
+      background: #101010;
+      color: var(--text);
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 4px rgba(214,168,79,0.12);
+    }
+
+    .summary-box {
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      background: rgba(0,0,0,0.22);
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .summary-box strong {
+      color: var(--gold);
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 16px 24px;
+      border-radius: 999px;
+      background: var(--gold);
+      color: #14100a;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1.4px;
+      font-weight: 700;
+      transition: 0.3s ease;
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(214,168,79,0.25);
+    }
+
+    .message {
+      min-height: 24px;
+      color: var(--green);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .message.error {
+      color: #ffb3b3;
+    }
+
+    footer {
+      padding: 28px 0;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 900px) {
+      .nav-links {
+        display: none;
+      }
+
+      .page {
+        padding: 24px 6vw;
+      }
+
+      main {
+        padding: 10vh 0 8vh;
+      }
+
+      .booking-hero,
+      .booking-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .booking-hero {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .panel {
+        padding: 20px;
+      }
+
+      .calendar-grid,
+      .weekdays {
+        gap: 7px;
+      }
+
+      .calendar-day {
+        border-radius: 12px;
+        font-size: 14px;
+      }
+
+      .slot-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <nav>
+      <a href="index.html" class="logo">
+        <span class="logo-mark">V</span>
+        <span>Pizzeria Vesuvio 97</span>
+      </a>
+      <div class="nav-links">
+        <a href="le-nostre-pizze.html">Le nostre pizze</a>
+        <a href="ordina-ora.html">Ordina Ora</a>
+        <a href="prenota-un-tavolo.html" class="active">Prenota un tavolo</a>
+        <a href="recensioni.html">Recensioni</a> 
+        <a href="chi-siamo.html">Chi siamo</a>
+      </div>
+    </nav>
+
+    <main>
+      <div class="booking-hero">
+        <div class="booking-intro">
+          <div class="eyebrow">Prenota</div>
+          <h1>Scegli il tuo tavolo.</h1>
+          <p>Seleziona una data disponibile, scegli lo slot orario e lascia i tuoi dati. Le date in rosso sono gi&agrave; sold out.</p>
+        </div>
+      </div>
+
+      <div class="booking-shell">
+        <section class="panel" aria-label="Calendario prenotazioni">
+          <div class="panel-title">
+            <h2 id="calendarMonth">Mese</h2>
+            <div class="calendar-actions">
+              <button class="icon-btn" type="button" id="prevMonth" aria-label="Mese precedente">&larr;</button>
+              <button class="icon-btn" type="button" id="nextMonth" aria-label="Mese successivo">&rarr;</button>
+            </div>
+          </div>
+
+          <div class="weekdays" aria-hidden="true">
+            <span>Lun</span>
+            <span>Mar</span>
+            <span>Mer</span>
+            <span>Gio</span>
+            <span>Ven</span>
+            <span>Sab</span>
+            <span>Dom</span>
+          </div>
+          <div class="calendar-grid" id="calendarGrid"></div>
+
+          <div class="legend">
+            <span><i class="available"></i> Disponibile</span>
+            <span><i class="sold"></i> Sold out</span>
+          </div>
+
+          <div class="slots">
+            <h3>Orario</h3>
+            <div class="slot-grid" id="slotGrid"></div>
+          </div>
+        </section>
+
+        <form class="panel form-card" id="bookingForm">
+          <input id="selectedDateInput" name="selectedDate" type="hidden">
+          <input id="selectedTimeInput" name="selectedTime" type="hidden">
+
+          <div>
+            <div class="eyebrow">I tuoi dati</div>
+            <h2 class="form-title">Completa la prenotazione</h2>
+          </div>
+
+          <div class="summary-box" id="bookingSummary">
+            Scegli prima una data e un orario disponibili.
+          </div>
+
+          <div class="field">
+            <label for="firstName">Nome</label>
+            <input id="firstName" name="firstName" type="text" autocomplete="given-name" required>
+          </div>
+
+          <div class="field">
+            <label for="lastName">Cognome</label>
+            <input id="lastName" name="lastName" type="text" autocomplete="family-name" required>
+          </div>
+
+          <div class="field">
+            <label for="phone">Cellulare</label>
+            <input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="+39 333 123 4567" required>
+          </div>
+
+          <div class="field">
+            <label for="people">Numero persone</label>
+            <select id="people" name="people" required>
+              <option value="">Seleziona</option>
+              <option value="1">1 persona</option>
+              <option value="2">2 persone</option>
+              <option value="3">3 persone</option>
+              <option value="4">4 persone</option>
+              <option value="5">5 persone</option>
+              <option value="6">6 persone</option>
+              <option value="7">7 persone</option>
+              <option value="8">8 persone</option>
+            </select>
+          </div>
+
+          <button class="submit-btn" type="submit">Prenota il tavolo</button>
+          <div class="message" id="formMessage" role="status" aria-live="polite"></div>
+        </form>
+      </div>
+    </main>
+
+    <footer>&copy; 2026 Vesuvio 97 - Pizzeria Napoletana</footer>
+  </div>
+
+  <script>
+    const monthNames = [
+      'Gennaio',
+      'Febbraio',
+      'Marzo',
+      'Aprile',
+      'Maggio',
+      'Giugno',
+      'Luglio',
+      'Agosto',
+      'Settembre',
+      'Ottobre',
+      'Novembre',
+      'Dicembre'
+    ];
+    const slots = ['19:00', '19:30', '20:00', '20:30', '21:00', '21:30', '22:00', '22:30'];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const toKey = (date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+
+    const addDays = (days) => {
+      const date = new Date(today);
+      date.setDate(date.getDate() + days);
+      return date;
+    };
+
+    const soldOutDates = new Set([2, 5, 9, 14, 18, 25, 31].map((days) => toKey(addDays(days))));
+    const limitedSlots = {
+      [toKey(addDays(1))]: ['19:00', '19:30'],
+      [toKey(addDays(4))]: ['20:00', '20:30'],
+      [toKey(addDays(7))]: ['21:30', '22:00']
+    };
+
+    let currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    let selectedDate = '';
+    let selectedSlot = '';
+
+    const calendarMonth = document.getElementById('calendarMonth');
+    const calendarGrid = document.getElementById('calendarGrid');
+    const slotGrid = document.getElementById('slotGrid');
+    const summary = document.getElementById('bookingSummary');
+    const form = document.getElementById('bookingForm');
+    const message = document.getElementById('formMessage');
+    const selectedDateInput = document.getElementById('selectedDateInput');
+    const selectedTimeInput = document.getElementById('selectedTimeInput');
+
+    const formatDate = (key) => {
+      if (!key) return '';
+      const [year, month, day] = key.split('-').map(Number);
+      return new Date(year, month - 1, day).toLocaleDateString('it-IT', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      });
+    };
+
+    const updateSummary = () => {
+      if (!selectedDate || !selectedSlot) {
+        summary.innerHTML = 'Scegli prima una data e un orario disponibili.';
+        selectedDateInput.value = '';
+        selectedTimeInput.value = '';
+        return;
+      }
+
+      selectedDateInput.value = selectedDate;
+      selectedTimeInput.value = selectedSlot;
+      summary.innerHTML = `Hai selezionato <strong>${formatDate(selectedDate)}</strong> alle <strong>${selectedSlot}</strong>.`;
+    };
+
+    const renderSlots = () => {
+      slotGrid.innerHTML = '';
+
+      slots.forEach((slot) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'slot-btn';
+        button.textContent = slot;
+        button.disabled = !selectedDate || (limitedSlots[selectedDate] || []).includes(slot);
+
+        if (slot === selectedSlot) {
+          button.classList.add('is-selected');
+        }
+
+        button.addEventListener('click', () => {
+          selectedSlot = slot;
+          message.textContent = '';
+          message.classList.remove('error');
+          renderSlots();
+          updateSummary();
+        });
+
+        slotGrid.appendChild(button);
+      });
+    };
+
+    const renderCalendar = () => {
+      calendarGrid.innerHTML = '';
+      calendarMonth.textContent = `${monthNames[currentMonth.getMonth()]} ${currentMonth.getFullYear()}`;
+
+      const year = currentMonth.getFullYear();
+      const month = currentMonth.getMonth();
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      const startOffset = (firstDay.getDay() + 6) % 7;
+
+      for (let index = 0; index < startOffset; index += 1) {
+        const empty = document.createElement('button');
+        empty.type = 'button';
+        empty.className = 'calendar-day is-empty';
+        empty.disabled = true;
+        calendarGrid.appendChild(empty);
+      }
+
+      for (let day = 1; day <= lastDay.getDate(); day += 1) {
+        const date = new Date(year, month, day);
+        const key = toKey(date);
+        const isPast = date < today;
+        const isSoldOut = soldOutDates.has(key);
+        const button = document.createElement('button');
+
+        button.type = 'button';
+        button.className = 'calendar-day';
+        button.textContent = day;
+        button.setAttribute('aria-label', `${formatDate(key)}${isSoldOut ? ', sold out' : ''}`);
+        button.disabled = isPast || isSoldOut;
+
+        if (isPast) button.classList.add('is-past');
+        if (isSoldOut) button.classList.add('is-sold-out');
+        if (!isPast && !isSoldOut) button.classList.add('is-available');
+        if (key === selectedDate) button.classList.add('is-selected');
+
+        button.addEventListener('click', () => {
+          selectedDate = key;
+          selectedSlot = '';
+          message.textContent = '';
+          message.classList.remove('error');
+          renderCalendar();
+          renderSlots();
+          updateSummary();
+        });
+
+        calendarGrid.appendChild(button);
+      }
+    };
+
+    document.getElementById('prevMonth').addEventListener('click', () => {
+      currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1);
+      renderCalendar();
+    });
+
+    document.getElementById('nextMonth').addEventListener('click', () => {
+      currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1);
+      renderCalendar();
+    });
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+
+      if (!selectedDate || !selectedSlot) {
+        message.textContent = 'Seleziona una data disponibile e uno slot orario prima di confermare.';
+        message.classList.add('error');
+        return;
+      }
+
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+      const firstName = document.getElementById('firstName').value.trim();
+      const lastName = document.getElementById('lastName').value.trim();
+      const people = document.getElementById('people').value;
+
+      message.classList.remove('error');
+      message.textContent = `Grazie ${firstName} ${lastName}, richiesta ricevuta per ${people} persone il ${formatDate(selectedDate)} alle ${selectedSlot}.`;
+      form.reset();
+      selectedDate = '';
+      selectedSlot = '';
+      renderCalendar();
+      renderSlots();
+      updateSummary();
+    });
+
+    renderCalendar();
+    renderSlots();
+    updateSummary();
+  </script>
+</body>
+</html>

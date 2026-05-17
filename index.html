@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vesuvio 97 | Pizzeria Napoletana</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #050505;
+      --bg-soft: #101010;
+      --card: #151515;
+      --gold: #d6a84f;
+      --gold-soft: rgba(214, 168, 79, 0.18);
+      --text: #f5f1e8;
+      --muted: #a9a39a;
+      --border: rgba(255, 255, 255, 0.08);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .hero {
+      min-height: 100vh;
+      position: relative;
+      background:
+        linear-gradient(90deg, rgba(5,5,5,0.95) 0%, rgba(5,5,5,0.68) 45%, rgba(5,5,5,0.2) 100%),
+        url('https://images.pexels.com/photos/29039070/pexels-photo-29039070.jpeg?_gl=1*sa9m32*_ga*Njk2OTE0Mjc5LjE3Nzg5NDgxNzA.*_ga_8JE65Q40S6*czE3Nzg5NTU3MzUkbzIkZzEkdDE3Nzg5NTU3NTIkajQzJGwwJGgw') center/cover no-repeat;
+      padding: 28px 7vw;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 72% 45%, rgba(214,168,79,0.22), transparent 28%);
+      pointer-events: none;
+    }
+
+    nav {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: 'Cinzel', serif;
+      letter-spacing: 3px;
+      font-size: 18px;
+    }
+
+    .logo-mark {
+      width: 34px;
+      height: 34px;
+      border: 1px solid var(--gold);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: var(--gold);
+      font-size: 16px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+      color: var(--muted);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    .nav-links a:hover {
+      color: var(--gold);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 720px;
+      padding-bottom: 10vh;
+      animation: fadeUp 1s ease forwards;
+    }
+
+    .eyebrow {
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      font-size: 12px;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(48px, 8vw, 108px);
+      line-height: 0.95;
+      letter-spacing: -2px;
+      margin-bottom: 24px;
+    }
+
+    .hero-content p {
+      max-width: 520px;
+      color: var(--muted);
+      line-height: 1.8;
+      font-size: 17px;
+      margin-bottom: 34px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 14px 24px;
+      border-radius: 999px;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1.4px;
+      font-weight: 700;
+      transition: 0.3s ease;
+    }
+
+    .btn-primary {
+      background: var(--gold);
+      color: #14100a;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(214,168,79,0.25);
+    }
+
+    .btn-secondary {
+      border: 1px solid var(--border);
+      color: var(--text);
+      background: rgba(255,255,255,0.03);
+      backdrop-filter: blur(12px);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    section {
+      padding: 100px 7vw;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 28px;
+      margin-bottom: 50px;
+    }
+
+    .section-header h2 {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(34px, 5vw, 64px);
+      font-weight: 600;
+    }
+
+    .section-header p {
+      max-width: 480px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .menu-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      overflow: hidden;
+      transition: 0.35s ease;
+    }
+
+    .menu-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(214,168,79,0.45);
+    }
+
+    .menu-card img {
+      width: 100%;
+      height: 230px;
+      object-fit: cover;
+      filter: saturate(0.95) contrast(1.05);
+    }
+
+    .menu-info {
+      padding: 24px;
+    }
+
+    .menu-info h3 {
+      font-family: 'Cinzel', serif;
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .menu-info p {
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .price {
+      color: var(--gold);
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .about {
+      background: var(--bg-soft);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .about img {
+      width: 100%;
+      height: 620px;
+      object-fit: cover;
+      border-radius: 34px;
+      border: 1px solid var(--border);
+    }
+
+    .about-content h2 {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(36px, 5vw, 70px);
+      margin-bottom: 24px;
+    }
+
+    .about-content p {
+      color: var(--muted);
+      line-height: 1.85;
+      margin-bottom: 22px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 36px;
+    }
+
+    .stat {
+      padding: 22px;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      background: rgba(255,255,255,0.03);
+    }
+
+    .stat strong {
+      display: block;
+      color: var(--gold);
+      font-size: 26px;
+      margin-bottom: 6px;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr 1fr;
+      gap: 20px;
+    }
+
+    .gallery-grid img {
+      width: 100%;
+      height: 360px;
+      object-fit: cover;
+      border-radius: 26px;
+      border: 1px solid var(--border);
+      opacity: 0.9;
+      transition: 0.35s ease;
+    }
+
+    .gallery-grid img:hover {
+      opacity: 1;
+      transform: scale(1.02);
+    }
+
+    .contact {
+      text-align: center;
+      background:
+        linear-gradient(rgba(5,5,5,0.88), rgba(5,5,5,0.92)),
+        url('https://images.unsplash.com/photo-1579751626657-72bc17010498?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+    }
+
+    .contact h2 {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(38px, 6vw, 78px);
+      margin-bottom: 20px;
+    }
+
+    .contact p {
+      color: var(--muted);
+      max-width: 600px;
+      margin: 0 auto 36px;
+      line-height: 1.8;
+    }
+
+    footer {
+      padding: 34px 7vw;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 900px) {
+      .nav-links {
+        display: none;
+      }
+
+      .hero {
+        min-height: 92vh;
+        background-position: center;
+      }
+
+      .section-header,
+      .about,
+      footer {
+        grid-template-columns: 1fr;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .menu-grid,
+      .gallery-grid,
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .about img {
+        height: 420px;
+      }
+
+      section {
+        padding: 74px 6vw;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero" id="home">
+    <nav>
+      <a href="#home" class="logo">
+        <span class="logo-mark">V</span>
+        <span>Pizzeria Vesuvio 97</span>
+      </a>
+      <div class="nav-links">
+        <a href="le-nostre-pizze.html">Le nostre pizze</a>
+        <a href="ordina-ora.html">Ordina Ora</a>
+        <a href="prenota-un-tavolo.html">Prenota un tavolo</a>
+        <a href="recensioni.html">Recensioni</a> 
+        <a href="chi-siamo.html">Chi siamo</a>
+      </div>
+    </nav>
+
+    <div class="hero-content">
+      <div class="eyebrow">Pizzeria napoletana contemporanea</div>
+      <h1>Pizza, fuoco<br>e identità.</h1>
+      <p>Un luogo dove l'impasto incontra il design: pizze napoletane, ingredienti campani e un'esperienza pensata per essere ricordata.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="ordina-ora.html">Ordina ora</a>
+        <a class="btn btn-secondary" href="le-nostre-pizze.html">Scopri il menu</a>
+      </div>
+    </div>
+  </header>
+
+  <section id="menu">
+    <div class="section-header">
+      <div>
+        <div class="eyebrow">QUELLE DEL MESE</div>
+        <h2>Pizze iconiche</h2>
+      </div>
+      <p>Sapori autentici, ingredienti selezionati e il calore della vera tradizione napoletana.</p>
+    </div>
+
+    <div class="menu-grid">
+      <article class="menu-card">
+        <img src="https://images.unsplash.com/photo-1604068549290-dea0e4a305ca?auto=format&fit=crop&w=1000&q=80" alt="Pizza Margherita">
+        <div class="menu-info">
+          <h3>Oro di Napoli</h3>
+          <p>San Marzano DOP, fiordilatte di Agerola, basilico fresco e olio EVO campano.</p>
+          <div class="price">€7,00</div>
+        </div>
+      </article>
+
+      <article class="menu-card">
+        <img src="https://images.pexels.com/photos/19260829/pexels-photo-19260829.jpeg?_gl=1*1ybh8bx*_ga*Njk2OTE0Mjc5LjE3Nzg5NDgxNzA.*_ga_8JE65Q40S6*czE3Nzg5NDgxNzAkbzEkZzEkdDE3Nzg5NDgzMzgkajQ2JGwwJGgw" alt="Pizza Diavola">
+        <div class="menu-info">
+          <h3>Pistacchiosa</h3>
+          <p>Pistacchio, provola affumicata, Mortadella e Mozzarella.</p>
+          <div class="price">€8,50</div>
+        </div>
+      </article>
+
+      <article class="menu-card">
+        <img src="https://images.unsplash.com/photo-1594007654729-407eedc4be65?auto=format&fit=crop&w=1000&q=80" alt="Pizza Bufalina">
+        <div class="menu-info">
+          <h3>Regina</h3>
+          <p>Mozzarella di bufala campana, pomodorini semi-dry, basilico e olio EVO.</p>
+          <div class="price">€9,00</div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="about" id="about">
+    <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1000&q=80" alt="Interno pizzeria elegante">
+    <div class="about-content">
+      <div class="eyebrow">Chi siamo</div>
+      <h2>Una pizzeria pensata come un brand.</h2>
+      <p>Vesuvio 97 nasce come concept digitale per mostrare come una pizzeria locale può diventare memorabile online: tono premium, immagini forti, identità chiara e percorso utente semplice.</p>
+      <p>L'obiettivo non è solo avere un sito, ma trasformare ogni visita in desiderio, fiducia e prenotazione.</p>
+
+      <div class="stats">
+        <div class="stat">
+          <strong>48h</strong>
+          <span>Lievitazione</span>
+        </div>
+        <div class="stat">
+          <strong>100%</strong>
+          <span>Ingredienti italiani</span>
+        </div>
+        <div class="stat">
+          <strong>4.9</strong>
+          <span>Esperienza percepita</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="gallery">
+    <div class="section-header">
+      <div>
+        <div class="eyebrow">Atmosfera visiva</div>
+        <h2>La gallery</h2>
+      </div>
+      <p>Una selezione di pizze pensata per raccontare Napoli, un morso alla volta.</p>
+    </div>
+
+    <div class="gallery-grid">
+      <img src="https://images.pexels.com/photos/35760009/pexels-photo-35760009.jpeg?_gl=1*qn4rc7*_ga*Njk2OTE0Mjc5LjE3Nzg5NDgxNzA.*_ga_8JE65Q40S6*czE3Nzg5NDgxNzAkbzEkZzEkdDE3Nzg5NDg0MjEkajQ3JGwwJGgw" alt="Pizza appena sfornata">
+      <img src="https://images.pexels.com/photos/21792440/pexels-photo-21792440.jpeg?_gl=1*d3ulnb*_ga*Njk2OTE0Mjc5LjE3Nzg5NDgxNzA.*_ga_8JE65Q40S6*czE3Nzg5NDgxNzAkbzEkZzEkdDE3Nzg5NDg0NTckajExJGwwJGgw" alt="Ingredienti italiani">
+      <img src="https://images.pexels.com/photos/6605223/pexels-photo-6605223.jpeg?_gl=1*yf3974*_ga*Njk2OTE0Mjc5LjE3Nzg5NDgxNzA.*_ga_8JE65Q40S6*czE3Nzg5NDgxNzAkbzEkZzEkdDE3Nzg5NDg1OTckajUkbDAkaDA." alt="Pizza al tavolo">
+    </div>
+  </section>
+
+  <section class="contact" id="contact">
+    <div class="eyebrow">Prenota il tuo tavolo</div>
+    <h2>La tua serata inizia da qui.</h2>
+    <p>Prenota il tuo tavolo con un click! Una prenotazione semplice e diretta.</p>
+    <a class="btn btn-primary" href="prenota-un-tavolo.html" target="_blank">Prenota Ora!</a>
+  </section>
+
+  <footer>
+    <span>© 2026 Vesuvio 97 — Pizzeria Napoletana</span>
+    <span>Website concept by Mario Castaldo</span>
+  </footer>
+</body>
+</html>
