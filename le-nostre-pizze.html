@@ -98,11 +98,14 @@
 
     main {
       flex: 1;
-      display: grid;
-      align-items: center;
-      max-width: 760px;
-      padding: 12vh 0;
+      width: 100%;
+      padding: 9vh 0 8vh;
       animation: fadeUp 1s ease forwards;
+    }
+
+    .gallery-head {
+      max-width: 780px;
+      margin-bottom: 42px;
     }
 
     .eyebrow {
@@ -126,26 +129,44 @@
       color: var(--muted);
       line-height: 1.8;
       font-size: 17px;
-      margin-bottom: 34px;
     }
 
-    .btn {
-      display: inline-flex;
-      width: fit-content;
-      padding: 14px 24px;
-      border-radius: 999px;
-      background: var(--gold);
-      color: #14100a;
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 1.4px;
-      font-weight: 700;
-      transition: 0.3s ease;
+    .pizza-gallery {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
     }
 
-    .btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 15px 40px rgba(214,168,79,0.25);
+    .pizza-photo {
+      min-height: 260px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      background: rgba(255,255,255,0.04);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+    }
+
+    .pizza-photo.tall {
+      grid-row: span 2;
+      min-height: 540px;
+    }
+
+    .pizza-photo.wide {
+      grid-column: span 2;
+    }
+
+    .pizza-photo img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      filter: saturate(0.95) contrast(1.05);
+      transition: 0.45s ease;
+    }
+
+    .pizza-photo:hover img {
+      transform: scale(1.06);
+      filter: saturate(1.08) contrast(1.08);
     }
 
     footer {
@@ -176,7 +197,21 @@
       }
 
       main {
-        padding: 14vh 0 10vh;
+        padding: 10vh 0 8vh;
+      }
+
+      .pizza-gallery {
+        grid-template-columns: 1fr;
+      }
+
+      .pizza-photo,
+      .pizza-photo.tall {
+        min-height: 320px;
+        grid-row: auto;
+      }
+
+      .pizza-photo.wide {
+        grid-column: auto;
       }
     }
   </style>
@@ -189,7 +224,8 @@
         <span>Pizzeria Vesuvio 97</span>
       </a>
       <div class="nav-links">
-        <a href="le-nostre-pizze.html">Le nostre pizze</a>
+        <a href="le-nostre-pizze.html" class="active">Le nostre pizze</a>
+        <a href="gallery.html">Gallery</a>
         <a href="ordina-ora.html">Ordina Ora</a>
         <a href="prenota-un-tavolo.html">Prenota un tavolo</a>
         <a href="recensioni.html">Recensioni</a> 
@@ -198,11 +234,36 @@
     </nav>
 
     <main>
-      <div>
-        <div class="eyebrow">Menu</div>
-        <h1>PAGINA IN MANUTENZIONE</h1>
-        <p>Stiamo preparando questa sezione con la stessa cura dei nostri impasti. Torna presto per scoprire le novita di Vesuvio 97.</p>
-        <a class="btn" href="index.html">Torna alla home</a>
+      <section class="gallery-head">
+        <div class="eyebrow">Le nostre pizze</div>
+        <h1>Una carrellata appena sfornata.</h1>
+      </section>
+
+      <div class="pizza-gallery" aria-label="Foto delle pizze Vesuvio 97">
+        <figure class="pizza-photo tall">
+          <img src="images/pizza1.png" alt="Pizza napoletana Vesuvio 97">
+        </figure>
+        <figure class="pizza-photo">
+          <img src="images/pizza2.png" alt="Pizza con ingredienti freschi">
+        </figure>
+        <figure class="pizza-photo">
+          <img src="images/pizza3.png" alt="Pizza appena preparata">
+        </figure>
+        <figure class="pizza-photo wide">
+          <img src="https://images.unsplash.com/photo-1604068549290-dea0e4a305ca?auto=format&fit=crop&w=1200&q=80" alt="Pizza margherita">
+        </figure>
+        <figure class="pizza-photo">
+          <img src="https://images.unsplash.com/photo-1594007654729-407eedc4be65?auto=format&fit=crop&w=900&q=80" alt="Pizza al forno">
+        </figure>
+        <figure class="pizza-photo tall">
+          <img src="https://images.unsplash.com/photo-1579751626657-72bc17010498?auto=format&fit=crop&w=900&q=80" alt="Pizza servita al tavolo">
+        </figure>
+        <figure class="pizza-photo">
+          <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=900&q=80" alt="Pizza con mozzarella e basilico">
+        </figure>
+        <figure class="pizza-photo">
+          <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=900&q=80" alt="Pizza con salame">
+        </figure>
       </div>
     </main>
 
