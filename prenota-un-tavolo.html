@@ -181,7 +181,8 @@
     .icon-btn,
     .slot-btn,
     .calendar-day,
-    .submit-btn {
+    .submit-btn,
+    .action-link {
       border: 0;
       font-family: inherit;
       cursor: pointer;
@@ -413,9 +414,36 @@
       transition: 0.3s ease;
     }
 
-    .submit-btn:hover {
+    .submit-btn:hover,
+    .action-link:hover {
       transform: translateY(-3px);
       box-shadow: 0 15px 40px rgba(214,168,79,0.25);
+    }
+
+    .booking-actions {
+      display: none;
+      gap: 10px;
+    }
+
+    .booking-actions.is-visible {
+      display: grid;
+    }
+
+    .action-link {
+      width: 100%;
+      min-height: 48px;
+      padding: 0 20px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--gold);
+      color: #14100a;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1.3px;
+      font-weight: 700;
+      transition: 0.3s ease;
     }
 
     .message {
@@ -582,6 +610,11 @@
           </div>
 
           <div class="field">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" autocomplete="email" placeholder="nome@email.it" required>
+          </div>
+
+          <div class="field">
             <label for="people">Numero persone</label>
             <select id="people" name="people" required>
               <option value="">Seleziona</option>
@@ -597,6 +630,9 @@
           </div>
 
           <button class="submit-btn" type="submit">Prenota il tavolo</button>
+          <div class="booking-actions" id="bookingActions" aria-label="Azioni riepilogo prenotazione">
+            <a class="action-link" id="whatsappBookingLink" href="#" target="_blank" rel="noopener">Invia prenotazione su WhatsApp</a>
+          </div>
           <div class="message" id="formMessage" role="status" aria-live="polite"></div>
         </form>
       </div>
@@ -605,7 +641,31 @@
     <footer>&copy; 2026 Vesuvio 97 - Pizzeria Napoletana</footer>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script>
+    const PIZZERIA_WHATSAPP_NUMBER = '393926493982';
+    const EMAILJS_PUBLIC_KEY = 'SFukLjizEBrXOq7-l';
+    const EMAILJS_SERVICE_ID = 'service_mopplm2';
+    const EMAILJS_BOOKING_TEMPLATE_ID = 'template_jl5qawc';
+
+    const EMAILJS_PLACEHOLDERS = [
+      'INSERISCI_PUBLIC_KEY',
+      'INSERISCI_SERVICE_ID',
+      'INSERISCI_TEMPLATE_ID'
+    ];
+
+    const isEmailJsConfigured = () => (
+      !EMAILJS_PLACEHOLDERS.includes(EMAILJS_PUBLIC_KEY)
+      && !EMAILJS_PLACEHOLDERS.includes(EMAILJS_SERVICE_ID)
+      && !EMAILJS_PLACEHOLDERS.includes(EMAILJS_BOOKING_TEMPLATE_ID)
+    );
+
+    if (window.emailjs && isEmailJsConfigured()) {
+      emailjs.init({
+        publicKey: EMAILJS_PUBLIC_KEY
+      });
+    }
+
     const monthNames = [
       'Gennaio',
       'Febbraio',
@@ -656,6 +716,26 @@
     const message = document.getElementById('formMessage');
     const selectedDateInput = document.getElementById('selectedDateInput');
     const selectedTimeInput = document.getElementById('selectedTimeInput');
+    const bookingActions = document.getElementById('bookingActions');
+    const whatsappBookingLink = document.getElementById('whatsappBookingLink');
+
+    const getFieldValue = (id) => document.getElementById(id).value.trim();
+
+    const createBookingId = () => {
+      const now = new Date();
+      const date = [
+        now.getFullYear(),
+        String(now.getMonth() + 1).padStart(2, '0'),
+        String(now.getDate()).padStart(2, '0')
+      ].join('');
+      const time = [
+        String(now.getHours()).padStart(2, '0'),
+        String(now.getMinutes()).padStart(2, '0'),
+        String(now.getSeconds()).padStart(2, '0')
+      ].join('');
+
+      return `PR-${date}-${time}`;
+    };
 
     const formatDate = (key) => {
       if (!key) return '';
@@ -666,6 +746,120 @@
         month: 'long',
         year: 'numeric'
       });
+    };
+
+    const buildBooking = () => ({
+      id: createBookingId(),
+      customer: {
+        firstName: getFieldValue('firstName'),
+        lastName: getFieldValue('lastName'),
+        phone: getFieldValue('phone'),
+        email: getFieldValue('email')
+      },
+      date: selectedDate,
+      formattedDate: formatDate(selectedDate),
+      time: selectedSlot,
+      people: getFieldValue('people')
+    });
+
+    const buildPizzeriaBookingMessage = (booking) => [
+      'Nuova prenotazione Vesuvio 97',
+      `Prenotazione: ${booking.id}`,
+      '',
+      `Cliente: ${booking.customer.firstName} ${booking.customer.lastName}`,
+      `Telefono: ${booking.customer.phone}`,
+      `Email: ${booking.customer.email}`,
+      `Data: ${booking.formattedDate}`,
+      `Orario: ${booking.time}`,
+      `Persone: ${booking.people}`
+    ].join('\n');
+
+    const buildCustomerBookingEmailBody = (booking) => [
+      `Ciao ${booking.customer.firstName},`,
+      '',
+      `abbiamo ricevuto la tua prenotazione ${booking.id} da Vesuvio 97.`,
+      '',
+      'Riepilogo prenotazione:',
+      `Data: ${booking.formattedDate}`,
+      `Orario: ${booking.time}`,
+      `Persone: ${booking.people}`,
+      '',
+      'Ti aspettiamo in pizzeria.',
+      'Grazie per aver scelto Vesuvio 97.'
+    ].join('\n');
+
+    const buildCustomerBookingEmailHtml = (booking) => buildCustomerBookingEmailBody(booking)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/\n/g, '<br>');
+
+    const buildBookingTemplateParams = (booking) => ({
+      email: booking.customer.email,
+      to_email: booking.customer.email,
+      to_name: `${booking.customer.firstName} ${booking.customer.lastName}`,
+      from_name: 'Vesuvio 97',
+      reply_to: booking.customer.email,
+      customer_name: `${booking.customer.firstName} ${booking.customer.lastName}`,
+      customer_phone: booking.customer.phone,
+      customer_email: booking.customer.email,
+      booking_id: booking.id,
+      booking_date: booking.formattedDate,
+      booking_time: booking.time,
+      booking_people: booking.people,
+      order_id: booking.id,
+      order_items: `Prenotazione tavolo per ${booking.people} persone - ${booking.formattedDate} alle ${booking.time}`,
+      order_total: 'Ti aspettiamo in pizzeria!',
+      orders: [
+        {
+          name: 'Prenotazione tavolo',
+          units: `${booking.people} persone`,
+          price: booking.time,
+          image_url: ''
+        }
+      ],
+      cost: {
+        shipping: '',
+        tax: '',
+        total: 'Ti aspettiamo in pizzeria!'
+      },
+      message: buildCustomerBookingEmailBody(booking),
+      message_html: buildCustomerBookingEmailHtml(booking)
+    });
+
+    const getEmailJsErrorMessage = (error) => {
+      if (error && error.text) return error.text;
+      if (error && error.message) return error.message;
+      return 'Errore sconosciuto EmailJS.';
+    };
+
+    const sendBookingEmail = (booking) => {
+      if (!isEmailJsConfigured()) {
+        return Promise.resolve({ skipped: true });
+      }
+
+      if (!window.emailjs) {
+        return Promise.reject(new Error('EmailJS non disponibile.'));
+      }
+
+      return emailjs
+        .send(
+          EMAILJS_SERVICE_ID,
+          EMAILJS_BOOKING_TEMPLATE_ID,
+          buildBookingTemplateParams(booking)
+        )
+        .then(() => ({ skipped: false }));
+    };
+
+    const updateBookingNotificationLink = (booking) => {
+      const whatsappMessage = buildPizzeriaBookingMessage(booking);
+      whatsappBookingLink.href = `https://wa.me/${PIZZERIA_WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`;
+      bookingActions.classList.add('is-visible');
+    };
+
+    const resetBookingNotificationLink = () => {
+      bookingActions.classList.remove('is-visible');
+      whatsappBookingLink.href = '#';
     };
 
     const updateSummary = () => {
@@ -699,6 +893,7 @@
           selectedSlot = slot;
           message.textContent = '';
           message.classList.remove('error');
+          resetBookingNotificationLink();
           renderSlots();
           updateSummary();
         });
@@ -748,6 +943,7 @@
           selectedSlot = '';
           message.textContent = '';
           message.classList.remove('error');
+          resetBookingNotificationLink();
           renderCalendar();
           renderSlots();
           updateSummary();
@@ -767,7 +963,7 @@
       renderCalendar();
     });
 
-    form.addEventListener('submit', (event) => {
+    form.addEventListener('submit', async (event) => {
       event.preventDefault();
 
       if (!selectedDate || !selectedSlot) {
@@ -781,12 +977,30 @@
         return;
       }
 
-      const firstName = document.getElementById('firstName').value.trim();
-      const lastName = document.getElementById('lastName').value.trim();
-      const people = document.getElementById('people').value;
+      const booking = buildBooking();
+      updateBookingNotificationLink(booking);
 
       message.classList.remove('error');
-      message.textContent = `Grazie ${firstName} ${lastName}, richiesta ricevuta per ${people} persone il ${formatDate(selectedDate)} alle ${selectedSlot}.`;
+      message.textContent = `Prenotazione ${booking.id} ricevuta. Invio email di riepilogo in corso...`;
+
+      try {
+        const result = await sendBookingEmail(booking);
+
+        if (result.skipped) {
+          const whatsappWindow = window.open(whatsappBookingLink.href, '_blank', 'noopener');
+          message.textContent = whatsappWindow
+            ? `Prenotazione ${booking.id} ricevuta. Configura EmailJS per inviare la mail automaticamente.`
+            : `Prenotazione ${booking.id} ricevuta. Configura EmailJS per inviare la mail automaticamente.`;
+        } else {
+          window.open(whatsappBookingLink.href, '_blank', 'noopener');
+          message.textContent = `Grazie ${booking.customer.firstName} ${booking.customer.lastName}, prenotazione ${booking.id} confermata per ${booking.people} persone il ${booking.formattedDate} alle ${booking.time}.`;
+        }
+      } catch (error) {
+        console.error('Errore EmailJS prenotazione:', error);
+        message.textContent = `Prenotazione ${booking.id} creata, ma l'invio automatico della mail non e' riuscito: ${getEmailJsErrorMessage(error)}`;
+        message.classList.add('error');
+      }
+
       form.reset();
       selectedDate = '';
       selectedSlot = '';

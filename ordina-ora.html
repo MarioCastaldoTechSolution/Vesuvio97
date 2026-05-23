@@ -227,6 +227,7 @@
 
     .add-btn,
     .submit-btn,
+    .action-link,
     .qty-btn,
     .remove-btn {
       border: 0;
@@ -235,7 +236,8 @@
     }
 
     .add-btn,
-    .submit-btn {
+    .submit-btn,
+    .action-link {
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -251,7 +253,8 @@
     }
 
     .add-btn:hover,
-    .submit-btn:hover {
+    .submit-btn:hover,
+    .action-link:hover {
       transform: translateY(-3px);
       box-shadow: 0 15px 40px rgba(214,168,79,0.25);
     }
@@ -434,6 +437,32 @@
       margin-top: 4px;
     }
 
+    .order-actions {
+      display: none;
+      gap: 10px;
+    }
+
+    .order-actions.is-visible {
+      display: grid;
+    }
+
+    .action-link {
+      width: 100%;
+      padding: 0 20px;
+    }
+
+    .action-link.secondary {
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+    }
+
+    .action-link.secondary:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+      box-shadow: none;
+    }
+
     .message {
       min-height: 24px;
       color: var(--green);
@@ -587,9 +616,16 @@
               </div>
             </div>
 
-            <div class="field">
-              <label for="phone">Cellulare</label>
-              <input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="+39 333 123 4567" required>
+            <div class="two-fields">
+              <div class="field">
+                <label for="phone">Cellulare</label>
+                <input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="+39 333 123 4567" required>
+              </div>
+
+              <div class="field">
+                <label for="email">Email</label>
+                <input id="email" name="email" type="email" autocomplete="email" placeholder="nome@email.it" required>
+              </div>
             </div>
 
             <div class="field">
@@ -637,6 +673,9 @@
             </div>
 
             <button class="submit-btn" type="submit">Invia ordine</button>
+            <div class="order-actions" id="orderActions" aria-label="Azioni riepilogo ordine">
+              <a class="action-link" id="whatsappOrderLink" href="#" target="_blank" rel="noopener">Invia ordine su WhatsApp</a>
+            </div>
             <div class="message" id="orderMessage" role="status" aria-live="polite"></div>
           </form>
         </aside>
@@ -646,7 +685,31 @@
     <footer>&copy; 2026 Vesuvio 97 - Pizzeria Napoletana</footer>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script>
+    const PIZZERIA_WHATSAPP_NUMBER = '393926493982';
+    const EMAILJS_PUBLIC_KEY = 'SFukLjizEBrXOq7-l';
+    const EMAILJS_SERVICE_ID = 'service_mopplm2';
+    const EMAILJS_TEMPLATE_ID = 'template_mkwekkb';
+
+    const EMAILJS_PLACEHOLDERS = [
+      'INSERISCI_PUBLIC_KEY',
+      'INSERISCI_SERVICE_ID',
+      'INSERISCI_TEMPLATE_ID'
+    ];
+
+    const isEmailJsConfigured = () => (
+      !EMAILJS_PLACEHOLDERS.includes(EMAILJS_PUBLIC_KEY)
+      && !EMAILJS_PLACEHOLDERS.includes(EMAILJS_SERVICE_ID)
+      && !EMAILJS_PLACEHOLDERS.includes(EMAILJS_TEMPLATE_ID)
+    );
+
+    if (window.emailjs && isEmailJsConfigured()) {
+      emailjs.init({
+        publicKey: EMAILJS_PUBLIC_KEY
+      });
+    }
+
     const products = [
       {
         id: 'margherita',
@@ -767,6 +830,8 @@
     const orderMessage = document.getElementById('orderMessage');
     const deliveryType = document.getElementById('deliveryType');
     const address = document.getElementById('address');
+    const orderActions = document.getElementById('orderActions');
+    const whatsappOrderLink = document.getElementById('whatsappOrderLink');
 
     const currency = new Intl.NumberFormat('it-IT', {
       style: 'currency',
@@ -776,6 +841,169 @@
     const getCartRows = () => Array.from(cart.values());
 
     const getTotal = () => getCartRows().reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+    const getFieldValue = (id) => document.getElementById(id).value.trim();
+
+    const createOrderId = () => {
+      const now = new Date();
+      const date = [
+        now.getFullYear(),
+        String(now.getMonth() + 1).padStart(2, '0'),
+        String(now.getDate()).padStart(2, '0')
+      ].join('');
+      const time = [
+        String(now.getHours()).padStart(2, '0'),
+        String(now.getMinutes()).padStart(2, '0'),
+        String(now.getSeconds()).padStart(2, '0')
+      ].join('');
+
+      return `VS-${date}-${time}`;
+    };
+
+    const formatCartRows = (rows) => rows
+      .map((item) => {
+        const lineTotal = item.lineTotal ?? item.price * item.quantity;
+        return `- ${item.quantity}x ${item.name} (${currency.format(lineTotal)})`;
+      })
+      .join('\n');
+
+    const buildOrder = () => {
+      const rows = getCartRows();
+      const delivery = getFieldValue('deliveryType');
+
+      return {
+        id: createOrderId(),
+        customer: {
+          firstName: getFieldValue('firstName'),
+          lastName: getFieldValue('lastName'),
+          phone: getFieldValue('phone'),
+          email: getFieldValue('email')
+        },
+        deliveryType: delivery,
+        address: delivery === 'Ritiro in pizzeria' ? 'Ritiro in pizzeria' : getFieldValue('address'),
+        time: getFieldValue('time'),
+        payment: getFieldValue('payment'),
+        notes: getFieldValue('notes') || 'Nessuna nota',
+        items: rows.map((item) => ({
+          name: item.name,
+          quantity: item.quantity,
+          unitPrice: item.price,
+          lineTotal: item.price * item.quantity
+        })),
+        total: getTotal()
+      };
+    };
+
+    const buildPizzeriaMessage = (order) => [
+      `Nuovo ordine Vesuvio 97`,
+      `Ordine: ${order.id}`,
+      '',
+      `Cliente: ${order.customer.firstName} ${order.customer.lastName}`,
+      `Telefono: ${order.customer.phone}`,
+      `Email: ${order.customer.email}`,
+      `Tipo ordine: ${order.deliveryType}`,
+      `Indirizzo: ${order.address}`,
+      `Orario: ${order.time}`,
+      `Pagamento: ${order.payment}`,
+      '',
+      'Prodotti:',
+      formatCartRows(order.items),
+      '',
+      `Totale: ${currency.format(order.total)}`,
+      `Note: ${order.notes}`
+    ].join('\n');
+
+    const buildCustomerEmailBody = (order) => [
+      `Ciao ${order.customer.firstName},`,
+      '',
+      `abbiamo ricevuto il tuo ordine ${order.id} da Vesuvio 97.`,
+      '',
+      'Riepilogo ordine:',
+      formatCartRows(order.items),
+      '',
+      `Tipo ordine: ${order.deliveryType}`,
+      `Indirizzo: ${order.address}`,
+      `Orario: ${order.time}`,
+      `Pagamento: ${order.payment}`,
+      `Totale: ${currency.format(order.total)}`,
+      `Note: ${order.notes}`,
+      '',
+      'Grazie per aver scelto Vesuvio 97.'
+    ].join('\n');
+
+    const buildCustomerEmailHtml = (order) => buildCustomerEmailBody(order)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/\n/g, '<br>');
+
+    const buildEmailTemplateParams = (order) => ({
+      email: order.customer.email,
+      to_email: order.customer.email,
+      to_name: `${order.customer.firstName} ${order.customer.lastName}`,
+      from_name: 'Vesuvio 97',
+      reply_to: order.customer.email,
+      customer_name: `${order.customer.firstName} ${order.customer.lastName}`,
+      customer_phone: order.customer.phone,
+      customer_email: order.customer.email,
+      order_id: order.id,
+      order_items: formatCartRows(order.items),
+      order_total: currency.format(order.total),
+      delivery_type: order.deliveryType,
+      delivery_address: order.address,
+      order_time: order.time,
+      payment_method: order.payment,
+      order_notes: order.notes,
+      orders: order.items.map((item) => ({
+        name: item.name,
+        units: item.quantity,
+        price: currency.format(item.lineTotal),
+        image_url: ''
+      })),
+      cost: {
+        shipping: order.deliveryType === 'Consegna a domicilio' ? currency.format(0) : currency.format(0),
+        tax: currency.format(0),
+        total: currency.format(order.total)
+      },
+      message: buildCustomerEmailBody(order),
+      message_html: buildCustomerEmailHtml(order)
+    });
+
+    const getEmailJsErrorMessage = (error) => {
+      if (error && error.text) return error.text;
+      if (error && error.message) return error.message;
+      return 'Errore sconosciuto EmailJS.';
+    };
+
+    const sendCustomerEmail = (order) => {
+      if (!isEmailJsConfigured()) {
+        return Promise.resolve({ skipped: true });
+      }
+
+      if (!window.emailjs) {
+        return Promise.reject(new Error('EmailJS non disponibile.'));
+      }
+
+      return emailjs
+        .send(
+          EMAILJS_SERVICE_ID,
+          EMAILJS_TEMPLATE_ID,
+          buildEmailTemplateParams(order)
+        )
+        .then(() => ({ skipped: false }));
+    };
+
+    const updateNotificationLinks = (order) => {
+      const whatsappMessage = buildPizzeriaMessage(order);
+
+      whatsappOrderLink.href = `https://wa.me/${PIZZERIA_WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`;
+      orderActions.classList.add('is-visible');
+    };
+
+    const resetNotificationLinks = () => {
+      orderActions.classList.remove('is-visible');
+      whatsappOrderLink.href = '#';
+    };
 
     const renderProducts = () => {
       products.forEach((product) => {
@@ -855,6 +1083,7 @@
 
       orderMessage.textContent = '';
       orderMessage.classList.remove('error');
+      resetNotificationLinks();
       renderCart();
     };
 
@@ -866,10 +1095,10 @@
         addToCart(addButton.dataset.product);
       }
 
-      if (cartButton) {
-        const productId = cartButton.dataset.product;
-        const item = cart.get(productId);
-        if (!item) return;
+        if (cartButton) {
+          const productId = cartButton.dataset.product;
+          const item = cart.get(productId);
+          if (!item) return;
 
         if (cartButton.dataset.action === 'increase') {
           item.quantity += 1;
@@ -884,6 +1113,9 @@
           cart.delete(productId);
         }
 
+        orderMessage.textContent = '';
+        orderMessage.classList.remove('error');
+        resetNotificationLinks();
         renderCart();
       }
     });
@@ -895,7 +1127,7 @@
       if (isPickup) address.value = '';
     });
 
-    orderForm.addEventListener('submit', (event) => {
+    orderForm.addEventListener('submit', async (event) => {
       event.preventDefault();
 
       if (cart.size === 0) {
@@ -909,12 +1141,31 @@
         return;
       }
 
-      const firstName = document.getElementById('firstName').value.trim();
-      const lastName = document.getElementById('lastName').value.trim();
-      const total = currency.format(getTotal());
+      const order = buildOrder();
+      const total = currency.format(order.total);
+      updateNotificationLinks(order);
 
       orderMessage.classList.remove('error');
-      orderMessage.textContent = `Grazie ${firstName} ${lastName}, ordine ricevuto. Totale: ${total}.`;
+      orderMessage.textContent = `Ordine ${order.id} ricevuto. Invio email di riepilogo in corso... Totale: ${total}.`;
+
+      try {
+        const result = await sendCustomerEmail(order);
+
+        if (result.skipped) {
+          const whatsappWindow = window.open(whatsappOrderLink.href, '_blank', 'noopener');
+          orderMessage.textContent = whatsappWindow
+            ? `Ordine ${order.id} ricevuto. WhatsApp e riepilogo email sono pronti. Configura EmailJS per inviare la mail automaticamente.`
+            : `Ordine ${order.id} ricevuto. Configura EmailJS per inviare la mail automaticamente, oppure usa i pulsanti qui sopra.`;
+        } else {
+          window.open(whatsappOrderLink.href, '_blank', 'noopener');
+          orderMessage.textContent = `Ordine ${order.id} ricevuto.`;
+        }
+      } catch (error) {
+        console.error('Errore EmailJS:', error);
+        orderMessage.textContent = `Ordine ${order.id} creato, ma l'invio automatico della mail non e' riuscito: ${getEmailJsErrorMessage(error)}`;
+        orderMessage.classList.add('error');
+      }
+
       cart.clear();
       orderForm.reset();
       address.required = true;
