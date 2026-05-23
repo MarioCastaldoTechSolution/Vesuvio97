@@ -338,13 +338,100 @@
     }
 
     footer {
-      padding: 34px 7vw;
+      padding: 58px 7vw 30px;
+      border-top: 1px solid var(--border);
+      background: #080808;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .footer-content {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr 0.8fr;
+      gap: 34px;
+      align-items: start;
+    }
+
+    .footer-block {
+      display: grid;
+      gap: 12px;
+    }
+
+    .footer-title {
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .footer-block p,
+    .footer-hours {
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .footer-address {
+      max-width: 300px;
+      color: var(--text);
+    }
+
+    .footer-hours {
+      display: grid;
+      gap: 8px;
+      list-style: none;
+    }
+
+    .footer-hours li {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      max-width: 280px;
+    }
+
+    .footer-hours strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 12px;
+    }
+
+    .social-link {
+      width: 44px;
+      height: 44px;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: var(--text);
+      background: rgba(255,255,255,0.04);
+      transition: 0.28s ease;
+    }
+
+    .social-link:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+      transform: translateY(-3px);
+    }
+
+    .social-link svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+      display: block;
+    }
+
+    .footer-bottom {
+      margin-top: 38px;
+      padding-top: 22px;
       border-top: 1px solid var(--border);
       display: flex;
       justify-content: space-between;
       gap: 20px;
-      color: var(--muted);
-      font-size: 13px;
+      flex-wrap: wrap;
     }
 
     @keyframes fadeUp {
@@ -369,9 +456,17 @@
       }
 
       .section-header,
-      .about,
-      footer {
+      .about {
         grid-template-columns: 1fr;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .footer-content {
+        grid-template-columns: 1fr;
+      }
+
+      .footer-bottom {
         flex-direction: column;
         align-items: flex-start;
       }
@@ -513,8 +608,41 @@
   </section>
 
   <footer>
-    <span>© 2026 Vesuvio 97 — Pizzeria Napoletana</span>
-    <span>Website concept by Mario Castaldo</span>
+    <div class="footer-content">
+      <div class="footer-block">
+        <span class="footer-title">Indirizzo</span>
+        <p class="footer-address">Via Vesuvio 97, 80137 Napoli (NA)</p>
+      </div>
+
+      <div class="footer-block">
+        <span class="footer-title">Orari</span>
+        <ul class="footer-hours">
+          <li><strong>Luned&igrave;</strong><span>Chiuso</span></li>
+          <li><strong>Marted&igrave; - Domenica</strong><span>18:30 - 23:30</span></li>
+        </ul>
+      </div>
+
+      <div class="footer-block">
+        <span class="footer-title">Social network</span>
+        <div class="social-links">
+          <a class="social-link" href="https://www.facebook.com/" target="_blank" rel="noopener" aria-label="Facebook Vesuvio 97">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5.02 3.66 9.18 8.44 9.94v-7.03H7.9v-2.91h2.54V9.84c0-2.52 1.5-3.91 3.78-3.91 1.1 0 2.24.2 2.24.2v2.48h-1.26c-1.24 0-1.63.78-1.63 1.57v1.88h2.78l-.44 2.91h-2.34V22C18.34 21.24 22 17.08 22 12.06z"></path>
+            </svg>
+          </a>
+          <a class="social-link" href="https://www.instagram.com/" target="_blank" rel="noopener" aria-label="Instagram Vesuvio 97">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M7 2h10c2.76 0 5 2.24 5 5v10c0 2.76-2.24 5-5 5H7c-2.76 0-5-2.24-5-5V7c0-2.76 2.24-5 5-5zm0 2c-1.66 0-3 1.34-3 3v10c0 1.66 1.34 3 3 3h10c1.66 0 3-1.34 3-3V7c0-1.66-1.34-3-3-3H7zm5 3.5A4.5 4.5 0 1 1 7.5 12 4.5 4.5 0 0 1 12 7.5zm0 2A2.5 2.5 0 1 0 14.5 12 2.5 2.5 0 0 0 12 9.5zm4.75-3.25a1 1 0 1 1-1 1 1 1 0 0 1 1-1z"></path>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span>&copy; 2026 Vesuvio 97 - Pizzeria Napoletana. Tutti i diritti riservati.</span>
+      <span>Website concept by Mario Castaldo</span>
+    </div>
   </footer>
   <script src="mobile-menu.js"></script>
 </body>
